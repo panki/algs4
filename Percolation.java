@@ -2,7 +2,7 @@ import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
-    private static final boolean full = false;
+    private static final boolean blocked = false;
     private static final boolean open = true;
 
     private final int size;
@@ -72,7 +72,8 @@ public class Percolation {
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
         validate(row, col);
-        return isFull(pos(row, col));
+        int cur = pos(row, col);
+        return isOpen(cur) && qf.connected(cur, virtualTop);
     }
 
     // returns the number of open sites
@@ -112,10 +113,6 @@ public class Percolation {
 
     private boolean isOpen(int pos) {
         return grid[pos] == open;
-    }
-
-    private boolean isFull(int pos) {
-        return grid[pos] == full;
     }
 
     // test client (optional)
