@@ -80,6 +80,8 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
+        if (size == 1)
+            return isOpen(1, 1);
         return qf.connected(virtualTop, virtualBottom);
     }
 
@@ -114,10 +116,10 @@ public class Percolation {
 
     // test client (optional)
     public static void main(String[] args) {
-        Percolation p = new Percolation(2);
-        p.open(1, 1);
-        StdOut.println(p.percolates());
-        p.open(2, 1);
+        Percolation p = new Percolation(1);
+        StdOut.println(p.numberOfOpenSites());
+        StdOut.println(p.isOpen(1, 1));
+        StdOut.println(p.isFull(1, 1));
         StdOut.println(p.percolates());
     }
 }
