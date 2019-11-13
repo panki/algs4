@@ -2,23 +2,35 @@ import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
-
-    private final int size;
-    private int openedCount;
-
-    private boolean[] grid;
     private static final boolean full = false;
     private static final boolean open = true;
 
+    private final int size;
+    private int openedCount;
+    private boolean[] grid;
     private final WeightedQuickUnionUF qf;
+    private int virtualTop;
+    private int virtualBottom;
 
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
         if (n <= 0)
             throw new IllegalArgumentException("Size n must be >= 1");
         size = n;
-        grid = new boolean[size * size];
-        qf = new WeightedQuickUnionUF(size * size);
+        int len = size * size;
+
+        grid = new boolean[len];
+        qf = new WeightedQuickUnionUF(len + 2); // 2 extra for virtual top & bottom nodes
+
+        virtualTop = len;
+        virtualBottom = len + 1;
+
+        // Connect top row to virtual top
+        // and bottom row to virtual bottom
+        for (int i = 0; i < size; i++) {
+            qf.union(i, virtualTop);
+            qf.union(i + len - size, virtualBottom);
+        }
     }
 
     // opens the site (row, col) if it is not open already
@@ -70,15 +82,7 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        for (int top = pos(1, 1); top <= pos(1, size); top++) {
-            if (isFull(top))
-                continue;
-            for (int bottom = pos(size, 1); bottom <= pos(size, size); bottom++) {
-                if (isOpen(bottom) && qf.connected(top, bottom))
-                    return true;
-            }
-        }
-        return false;
+        return qf.connected(virtualTop, virtualBottom);
     }
 
     private int pos(int row, int col) {
