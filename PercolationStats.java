@@ -1,12 +1,10 @@
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
 import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.Stopwatch;
 
 public class PercolationStats {
 
     private static final double CONFIDENCE_95_KOEFF = 1.96;
-    private final double[] results;
     private final double stddev;
     private final double mean;
     private final double confidenceLo;
@@ -17,7 +15,7 @@ public class PercolationStats {
         if (n < 1 || trials < 1)
             throw new IllegalArgumentException("Size n and number of trials both must be >= 1");
 
-        results = new double[trials];
+        double[] results = new double[trials];
         for (int pass = 0; pass < trials; pass++) {
             Percolation p = new Percolation(n);
             do {

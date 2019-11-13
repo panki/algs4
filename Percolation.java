@@ -2,9 +2,6 @@ import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
-    private static final boolean blocked = false;
-    private static final boolean open = true;
-
     private final int size;
     private int openedCount;
     private boolean[] grid;
@@ -39,10 +36,10 @@ public class Percolation {
 
         int cur = pos(row, col);
 
-        if (grid[cur] == open)
+        if (grid[cur])
             return;
 
-        grid[cur] = open;
+        grid[cur] = true;
         openedCount++;
 
         int left = posLeft(cur);
@@ -107,12 +104,12 @@ public class Percolation {
     }
 
     private void validate(int row, int col) {
-        if (row < 1 || col < 1)
-            throw new IllegalArgumentException("row and col must be >= 1");
+        if (row < 1 || col < 1 || row > size || col > size)
+            throw new IllegalArgumentException(String.format("row and col must be between 1 and %d", size));
     }
 
     private boolean isOpen(int pos) {
-        return grid[pos] == open;
+        return grid[pos];
     }
 
     // test client (optional)
