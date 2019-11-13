@@ -1,4 +1,3 @@
-import java.lang.IllegalArgumentException;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
 import edu.princeton.cs.algs4.StdOut;
@@ -6,7 +5,12 @@ import edu.princeton.cs.algs4.Stopwatch;
 
 public class PercolationStats {
 
-    private double[] results;
+    private static final double CONFIDENCE_95_KOEFF = 1.96;
+    private final double[] results;
+    private final double stddev;
+    private final double mean;
+    private final double confidenceLo;
+    private final double confidenceHi;
 
     // perform independent trials on an n-by-n grid
     public PercolationStats(int n, int trials) {
@@ -23,26 +27,32 @@ public class PercolationStats {
             } while (!p.percolates());
             results[pass] = (double) p.numberOfOpenSites() / (n * n);
         }
+        mean = StdStats.mean(results);
+        stddev = StdStats.stddev(results);
+        double confidenceDelta = CONFIDENCE_95_KOEFF * stddev / Math.sqrt(trials);
+        confidenceLo = mean - confidenceDelta;
+        confidenceHi = mean + confidenceDelta;
+
     }
 
     // sample mean of percolation threshold
     public double mean() {
-        return StdStats.mean(results);
+        return mean;
     }
 
     // sample standard deviation of percolation threshold
     public double stddev() {
-        return StdStats.stddev(results);
+        return stddev;
     }
 
     // low endpoint of 95% confidence interval
     public double confidenceLo() {
-        return mean() - 1.96 * stddev() / Math.sqrt(results.length);
+        return confidenceLo;
     }
 
     // high endpoint of 95% confidence interval
     public double confidenceHi() {
-        return mean() + 1.96 * stddev() / Math.sqrt(results.length);
+        return confidenceHi;
     }
 
     public static void main(String[] args) {

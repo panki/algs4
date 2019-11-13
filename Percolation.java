@@ -1,16 +1,16 @@
-import java.lang.IllegalArgumentException;
+import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 
-    private int size;
+    private final int size;
     private int openedCount;
 
     private boolean[] grid;
-    private final boolean FULL = false;
-    private final boolean OPEN = true;
+    private static final boolean full = false;
+    private static final boolean open = true;
 
-    public WeightedQuickUnionUF qf;
+    private final WeightedQuickUnionUF qf;
 
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
@@ -27,10 +27,10 @@ public class Percolation {
 
         int cur = pos(row, col);
 
-        if (grid[cur] == OPEN)
+        if (grid[cur] == open)
             return;
 
-        grid[cur] = OPEN;
+        grid[cur] = open;
         openedCount++;
 
         int left = posLeft(cur);
@@ -107,14 +107,19 @@ public class Percolation {
     }
 
     private boolean isOpen(int pos) {
-        return grid[pos] == OPEN;
+        return grid[pos] == open;
     }
 
     private boolean isFull(int pos) {
-        return grid[pos] == FULL;
+        return grid[pos] == full;
     }
 
     // test client (optional)
     public static void main(String[] args) {
+        Percolation p = new Percolation(2);
+        p.open(1, 1);
+        StdOut.println(p.percolates());
+        p.open(2, 1);
+        StdOut.println(p.percolates());
     }
 }
