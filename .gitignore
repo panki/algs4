@@ -1,0 +1,6 @@
+data
+.vscode
+algo
+*.jar
+*.class
+*.zip
