@@ -26,15 +26,24 @@ public class Percolation {
 
     /**
      * Variable representing {@code WeightedQuickUnionUF} class which implements
-     * weighted quick union-find algorithm
+     * weighted quick union-find algorithm, uses 2 virtual sites top and bottom to
+     * calculate perculation
      */
     private final WeightedQuickUnionUF qf;
+
+    /**
+     * Variable representing {@code WeightedQuickUnionUF} class which implements
+     * weighted quick union-find algorithm, uses only 1 top virtual site to
+     * calculate fullness
+     */
+    private final WeightedQuickUnionUF qfFull;
 
     /**
      * {@code int} variable representing the reserved virtual top site index. It is
      * used for simplified union with top/bottom row of the grid
      */
     private final int virtualTop, virtualBottom;
+    private final int virtualTopFull;
 
     /**
      * Takes {@code int} variable and creates N*N grid with all sites initially
@@ -49,9 +58,11 @@ public class Percolation {
         int len = size * size;
 
         opened = new boolean[len];
-        qf = new WeightedQuickUnionUF(len + 2); // 1 extra for virtual top
+        qf = new WeightedQuickUnionUF(len + 2); // 2 extra for virtual top & bottom
+        qfFull = new WeightedQuickUnionUF(len + 1); // 1 extra for virtual top
 
         virtualTop = len;
+        virtualTopFull = len;
         virtualBottom = len + 1;
     }
 
@@ -77,23 +88,33 @@ public class Percolation {
         int top = posTop(cur);
         int bottom = posBottom(cur);
 
-        if (row == 1)
+        if (row == 1) {
             qf.union(cur, virtualTop);
+            qfFull.union(cur, virtualTopFull);
+        }
 
         if (row == size)
             qf.union(cur, virtualBottom);
 
-        if (col > 1 && isOpen(left))
+        if (col > 1 && isOpen(left)) {
             qf.union(cur, left);
+            qfFull.union(cur, left);
+        }
 
-        if (col < size && isOpen(right))
+        if (col < size && isOpen(right)) {
             qf.union(cur, right);
+            qfFull.union(cur, right);
+        }
 
-        if (row > 1 && isOpen(top))
+        if (row > 1 && isOpen(top)) {
             qf.union(cur, top);
+            qfFull.union(cur, top);
+        }
 
-        if (row < size && isOpen(bottom))
+        if (row < size && isOpen(bottom)) {
             qf.union(cur, bottom);
+            qfFull.union(cur, bottom);
+        }
     }
 
     /**
@@ -127,7 +148,7 @@ public class Percolation {
     public boolean isFull(int row, int col) {
         validate(row, col);
         int cur = pos(row, col);
-        return qf.connected(cur, virtualTop);
+        return qfFull.connected(cur, virtualTopFull);
     }
 
     /**
