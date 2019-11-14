@@ -1,51 +1,87 @@
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
+/**
+ * This class solves the "real world" Percolation problem using weighted quick
+ * union-find algorithm
+ *
+ * @author Alexander Panko
+ */
 public class Percolation {
+    /**
+     * {@code int} variable representing the grid's side length
+     */
     private final int size;
-    private int openedCount;
-    private boolean[] grid;
-    private final WeightedQuickUnionUF qf;
-    private int virtualTop;
-    private int virtualBottom;
 
-    // creates n-by-n grid, with all sites initially blocked
+    /**
+     * {@code int} variable representing the grid's opened sites count
+     */
+    private int openedCount;
+
+    /**
+     * {@code boolean} array representing the grid: {@code true} - site is already
+     * opened {@code false} - site is closed yet
+     */
+    private boolean[] opened;
+
+    /**
+     * Variable representing {@code WeightedQuickUnionUF} class which implements
+     * weighted quick union-find algorithm
+     */
+    private final WeightedQuickUnionUF qf;
+
+    /**
+     * {@code int} variable representing the reserved virtual top site index. It is
+     * used for simplified union with top/bottom row of the grid
+     */
+    private final int virtualTop, virtualBottom;
+
+    /**
+     * Takes {@code int} variable and creates N*N grid with all sites initially
+     * blocked
+     *
+     * @param n - grid's side length
+     */
     public Percolation(int n) {
         if (n <= 0)
             throw new IllegalArgumentException("Size n must be >= 1");
         size = n;
         int len = size * size;
 
-        grid = new boolean[len];
-        qf = new WeightedQuickUnionUF(len + 2); // 2 extra for virtual top & bottom nodes
+        opened = new boolean[len];
+        qf = new WeightedQuickUnionUF(len + 2); // 1 extra for virtual top
 
         virtualTop = len;
         virtualBottom = len + 1;
-
-        // Connect top row to virtual top
-        // and bottom row to virtual bottom
-        for (int i = 0; i < size; i++) {
-            qf.union(i, virtualTop);
-            qf.union(i + len - size, virtualBottom);
-        }
     }
 
-    // opens the site (row, col) if it is not open already
+    /**
+     * Opens the site if it is not open already
+     *
+     * @param row - row index
+     * @param col - col index
+     */
     public void open(int row, int col) {
         validate(row, col);
 
         int cur = pos(row, col);
 
-        if (grid[cur])
+        if (opened[cur])
             return;
 
-        grid[cur] = true;
+        opened[cur] = true;
         openedCount++;
 
         int left = posLeft(cur);
         int right = posRight(cur);
         int top = posTop(cur);
         int bottom = posBottom(cur);
+
+        if (row == 1)
+            qf.union(cur, virtualTop);
+
+        if (row == size)
+            qf.union(cur, virtualBottom);
 
         if (col > 1 && isOpen(left))
             qf.union(cur, left);
@@ -60,29 +96,47 @@ public class Percolation {
             qf.union(cur, bottom);
     }
 
-    // is the site (row, col) open?
+    /**
+     * Shows if the whole grid percolates
+     *
+     * @return {@code true} if the grid percolates, {@code false} if it doesn't
+     */
+    public boolean percolates() {
+        return qf.connected(virtualBottom, virtualTop);
+    }
+
+    /**
+     * Shows if the site with given column and row is open
+     *
+     * @param row - row index
+     * @param col - column index
+     * @return {@code true} if site is open, {@code false} if it's not
+     */
     public boolean isOpen(int row, int col) {
         validate(row, col);
         return isOpen(pos(row, col));
     }
 
-    // is the site (row, col) full?
+    /**
+     * Shows if the site with given column and row is full with liquid
+     *
+     * @param row - row index
+     * @param col - column index
+     * @return {@code true} if site is full, {@code false} if it's not
+     */
     public boolean isFull(int row, int col) {
         validate(row, col);
         int cur = pos(row, col);
-        return isOpen(cur) && qf.connected(cur, virtualTop);
+        return qf.connected(cur, virtualTop);
     }
 
-    // returns the number of open sites
+    /**
+     * Returns count of opened sites
+     *
+     * @return {@code int}
+     */
     public int numberOfOpenSites() {
         return openedCount;
-    }
-
-    // does the system percolate?
-    public boolean percolates() {
-        if (size == 1)
-            return isOpen(1, 1);
-        return qf.connected(virtualTop, virtualBottom);
     }
 
     private int pos(int row, int col) {
@@ -111,7 +165,7 @@ public class Percolation {
     }
 
     private boolean isOpen(int pos) {
-        return grid[pos];
+        return opened[pos];
     }
 
     // test client (optional)
