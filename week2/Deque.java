@@ -1,10 +1,12 @@
 import java.util.NoSuchElementException;
 import java.util.Iterator;
+import java.util.ListIterator;
+
 import edu.princeton.cs.algs4.StdOut;
 
 public class Deque<Item> implements Iterable<Item> {
 
-    class Node {
+    private class Node {
         public Item item;
         public Node prev;
         public Node next;
@@ -15,11 +17,11 @@ public class Deque<Item> implements Iterable<Item> {
     private int size;
 
     public boolean isEmpty() {
-        return this.size == 0;
+        return size == 0;
     }
 
     public int size() {
-        return this.size;
+        return size;
     }
 
     public void addFirst(Item item) {
@@ -29,74 +31,81 @@ public class Deque<Item> implements Iterable<Item> {
         Node node = new Node();
         node.item = item;
 
-        if (this.size > 0) {
-            node.next = this.first;
-            this.first.prev = node;
+        if (size > 0) {
+            node.next = first;
+            first.prev = node;
         } else {
-            this.last = node;
+            last = node;
         }
 
-        this.first = node;
-        this.size++;
+        first = node;
+        size++;
     }
 
     public void addLast(Item item) {
         if (item == null)
             throw new IllegalArgumentException();
         if (isEmpty()) {
-            this.addFirst(item);
+            addFirst(item);
             return;
         }
         Node node = new Node();
         node.item = item;
-        node.prev = this.last;
+        node.prev = last;
 
-        this.last.next = node;
-        this.last = node;
-        this.size++;
+        last.next = node;
+        last = node;
+        size++;
     }
 
-    public Item removeFirst() throws NoSuchElementException {
-        if (this.isEmpty())
+    public Item removeFirst() {
+        if (isEmpty())
             throw new NoSuchElementException();
-        Item item = this.first.item;
-        Node next = this.first.next;
-        if (next != null)
+        Item item = first.item;
+        Node next = first.next;
+        first = next;
+        size--;
+
+        if (size > 0) {
             next.prev = null;
-        this.first = next;
-        this.size--;
+        } else {
+            first = null;
+            last = null;
+        }
+
         return item;
     }
 
-    public Item removeLast() throws NoSuchElementException {
-        if (this.isEmpty())
+    public Item removeLast() {
+        if (isEmpty())
             throw new NoSuchElementException();
-        Item item = this.last.item;
-        Node prev = this.last.prev;
-        if (prev != null)
+        Item item = last.item;
+        Node prev = last.prev;
+        last = prev;
+        size--;
+        if (size > 0) {
             prev.next = null;
-        this.last = prev;
-        this.size--;
+        } else {
+            first = null;
+            last = null;
+        }
+
         return item;
     }
 
     public Iterator<Item> iterator() {
-        return new ListIterator(first);
+        return new ListIterator();
     }
 
     private class ListIterator implements Iterator<Item> {
-        private Node current;
-
-        public ListIterator(Node first) {
-            current = first;
-        }
+        private Node current = first;
 
         public boolean hasNext() {
             return current != null;
         }
 
         public Item next() {
-            if (current == null)
+            if (!hasNext())
                 throw new NoSuchElementException();
             Item item = current.item;
             current = current.next;
@@ -112,9 +121,9 @@ public class Deque<Item> implements Iterable<Item> {
 
         Deque<Integer> q = new Deque<Integer>();
 
-        StdOut.printf("Size: %d, IsEmpty: %s\n", q.size, q.isEmpty());
+        StdOut.printf("Size: %d, IsEmpty: %s\n", q.size(), q.isEmpty());
 
-        int count = 2;
+        int count = 10;
 
         StdOut.printf("Inserting: %d elements\n", count * 2);
 
@@ -125,7 +134,7 @@ public class Deque<Item> implements Iterable<Item> {
             q.addLast(i * 100);
         }
 
-        StdOut.printf("Size: %d, IsEmpty: %s\n", q.size, q.isEmpty());
+        StdOut.printf("Size: %d, IsEmpty: %s\n", q.size(), q.isEmpty());
 
         StdOut.println("Iterating:");
         for (int i : q) {
@@ -138,6 +147,6 @@ public class Deque<Item> implements Iterable<Item> {
             StdOut.printf("removeLast = %d\n", q.removeLast());
         }
 
-        StdOut.printf("Size: %d, IsEmpty: %s\n", q.size, q.isEmpty());
+        StdOut.printf("Size: %d, IsEmpty: %s\n", q.size(), q.isEmpty());
     }
 }
