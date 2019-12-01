@@ -2,40 +2,16 @@ import java.util.NoSuchElementException;
 import java.util.Iterator;
 import edu.princeton.cs.algs4.StdOut;
 
-class DequeIterator<Item> implements Iterator<Item> {
-    private Node<Item> current;
-
-    public DequeIterator(Node<Item> current) {
-        this.current = current;
-    }
-
-    public boolean hasNext() {
-        return this.current != null;
-    }
-
-    public Item next() {
-        if (this.current == null)
-            throw new NoSuchElementException();
-        Item item = current.item;
-        current = current.next;
-        return item;
-    }
-
-    public void remove() {
-        throw new UnsupportedOperationException();
-    }
-}
-
-class Node<Item> {
-    public Item item;
-    public Node<Item> prev;
-    public Node<Item> next;
-}
-
 public class Deque<Item> implements Iterable<Item> {
 
-    private Node<Item> first;
-    private Node<Item> last;
+    class Node {
+        public Item item;
+        public Node prev;
+        public Node next;
+    }
+
+    private Node first;
+    private Node last;
     private int size;
 
     public boolean isEmpty() {
@@ -50,7 +26,7 @@ public class Deque<Item> implements Iterable<Item> {
         if (item == null)
             throw new IllegalArgumentException();
 
-        Node<Item> node = new Node<Item>();
+        Node node = new Node();
         node.item = item;
 
         if (this.size > 0) {
@@ -71,7 +47,7 @@ public class Deque<Item> implements Iterable<Item> {
             this.addFirst(item);
             return;
         }
-        Node<Item> node = new Node<Item>();
+        Node node = new Node();
         node.item = item;
         node.prev = this.last;
 
@@ -84,7 +60,7 @@ public class Deque<Item> implements Iterable<Item> {
         if (this.isEmpty())
             throw new NoSuchElementException();
         Item item = this.first.item;
-        Node<Item> next = this.first.next;
+        Node next = this.first.next;
         if (next != null)
             next.prev = null;
         this.first = next;
@@ -96,7 +72,7 @@ public class Deque<Item> implements Iterable<Item> {
         if (this.isEmpty())
             throw new NoSuchElementException();
         Item item = this.last.item;
-        Node<Item> prev = this.last.prev;
+        Node prev = this.last.prev;
         if (prev != null)
             prev.next = null;
         this.last = prev;
@@ -105,15 +81,40 @@ public class Deque<Item> implements Iterable<Item> {
     }
 
     public Iterator<Item> iterator() {
-        return new DequeIterator<Item>(this.first);
+        return new ListIterator(first);
+    }
+
+    private class ListIterator implements Iterator<Item> {
+        private Node current;
+
+        public ListIterator(Node first) {
+            current = first;
+        }
+
+        public boolean hasNext() {
+            return current != null;
+        }
+
+        public Item next() {
+            if (current == null)
+                throw new NoSuchElementException();
+            Item item = current.item;
+            current = current.next;
+            return item;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
     }
 
     public static void main(String[] args) {
+
         Deque<Integer> q = new Deque<Integer>();
 
         StdOut.printf("Size: %d, IsEmpty: %s\n", q.size, q.isEmpty());
 
-        int count = 6;
+        int count = 2;
 
         StdOut.printf("Inserting: %d elements\n", count * 2);
 
